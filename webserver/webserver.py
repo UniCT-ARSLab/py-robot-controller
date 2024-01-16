@@ -1,10 +1,6 @@
 from flask import Flask, request, jsonify, redirect
-from flask_cors import CORS
-from flask_socketio import SocketIO
 
 app = Flask(__name__)
-CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Get robot position
 @app.route('/robot/position', methods=['GET'])
@@ -71,22 +67,5 @@ def robot_align():
 def robot_starter_toggle():
     pass
 
-# WebSocket events
-
-# Handle WebSocket connection
-@socketio.on('connect')
-def handle_connect():
-    pass
-
-# Handle WebSocket disconnect
-@socketio.on('disconnect')
-def handle_disconnect():
-    pass
-
-# Handle WebSocket messages
-@socketio.on('message')
-def handle_message(msg):
-    pass
-
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
