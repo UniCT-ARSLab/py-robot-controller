@@ -1,0 +1,4 @@
+DEBUG_CAN = True
+CHANNEL = 'can0'
+
+ID_ROBOT_POSITION = 0x3e3
