@@ -2,7 +2,7 @@ import struct
 
 import can
 
-from robot.constants import ID_ROBOT_POSITION
+#from robot.constants import ID_ROBOT_POSITION
 
 
 def get_v_bus(_channel: str) -> can.interface.Bus:

@@ -2,7 +2,7 @@ import struct
 
 import can
 
-from robot.constants import DEBUG_CAN, ID_ROBOT_POSITION
+from robot.constants import DEBUG_CAN, CAN_IDS
 
 
 class Robot:
@@ -15,7 +15,11 @@ class Robot:
         # Extract data from the CAN message
         data = frm.data
 
-        if frm.arbitration_id == ID_ROBOT_POSITION:
+        if frm.arbitration_id not in CAN_IDS.values():
+            print(f"Unknown CAN ID: {frm.arbitration_id}")
+            return
+
+        if frm.arbitration_id == CAN_IDS["ID_ROBOT_POSITION"]:
             posX, posY, angle = struct.unpack("<hhh", data[:6])
 
             # Convert the angle to a float by dividing by 100
@@ -31,5 +35,8 @@ class Robot:
             self.Position["Y"] = posY
             self.Position["Angle"] = angle
 
-            if DEBUG_CAN:
+            if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
                 print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
+                
+    def get_position(self):
+        return self.Position
