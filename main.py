@@ -1,7 +1,7 @@
 import can
 
-from robot.constants import CHANNEL, DEBUG_VIRTUAL, DEBUG_CAN, CAN_IDS
-from robot.model import CAN_position
+from models.can_packet import CAN_position
+from robot.constants import CAN_IDS, CHANNEL, DEBUG_CAN, DEBUG_VIRTUAL
 from robot.robot import Robot
 from robot.virtual import get_v_bus, get_v_message
 
@@ -18,11 +18,15 @@ if DEBUG_VIRTUAL:
     v_bus.send(v_messageUnk)
 
 robot = Robot()
+robot.init_lidar()
 
 try:
     while True:
+        robot.get_lidar_data()
+
         message = bus.recv()
-        print(message)
+        if DEBUG_CAN:
+            print(message)
 
         if message is not None:
             try:
