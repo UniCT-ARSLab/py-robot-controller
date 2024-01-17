@@ -1,17 +1,17 @@
 import can
 
-from robot.constants import CHANNEL, DEBUG_CAN, CAN_IDS
+from robot.constants import CHANNEL, DEBUG_VIRTUAL, DEBUG_CAN, CAN_IDS
 from robot.model import CAN_position
 from robot.robot import Robot
 from robot.virtual import get_v_bus, get_v_message
 
-_bustype='socketcan' if not DEBUG_CAN else 'virtual'
+_bustype='socketcan' if not DEBUG_VIRTUAL else 'virtual'
 bus = can.interface.Bus(channel=CHANNEL, bustype=_bustype)
 
-if DEBUG_CAN:
+if DEBUG_VIRTUAL:
     v_bus = get_v_bus(CHANNEL)
 
-    v_message = get_v_message(CAN_IDS["ID_ROBOT_POSITION"], "<hhh", CAN_position)
+    v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], "<hhh", CAN_position)
     v_messageUnk = get_v_message(0x333, "<hhh", CAN_position)
 
     v_bus.send(v_message)
@@ -35,5 +35,5 @@ except Exception as e:
     print(str(e))
 finally:
     bus.shutdown()
-    if DEBUG_CAN:
+    if DEBUG_VIRTUAL:
         v_bus.shutdown()

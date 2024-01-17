@@ -19,7 +19,7 @@ class Robot:
             print(f"Unknown CAN ID: {frm.arbitration_id}")
             return
 
-        if frm.arbitration_id == CAN_IDS["ID_ROBOT_POSITION"]:
+        if frm.arbitration_id == CAN_IDS["ROBOT_POSITION"]:
             posX, posY, angle = struct.unpack("<hhh", data[:6])
 
             # Convert the angle to a float by dividing by 100
