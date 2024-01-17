@@ -1,6 +1,6 @@
 import can
 
-from robot.constants import CHANNEL, DEBUG_CAN
+from robot.constants import CHANNEL, DEBUG_CAN, ID_ROBOT_POSITION
 from robot.model import CAN_position
 from robot.robot import Robot
 from robot.virtual import get_v_bus, get_v_message
@@ -10,7 +10,7 @@ bus = can.interface.Bus(channel=CHANNEL, bustype=_bustype)
 
 if DEBUG_CAN:
     v_bus = get_v_bus(CHANNEL)
-    v_message = get_v_message("<hhh", CAN_position)
+    v_message = get_v_message(ID_ROBOT_POSITION, "<hhh", CAN_position)
     v_bus.send(v_message)
 
 robot = Robot()
