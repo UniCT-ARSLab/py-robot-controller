@@ -1,3 +1,5 @@
 flask
 python-can
 git+https://github.com/simondlevy/BreezyLidar.git#egg=BreezyLidar&subdirectory=python
+websockets
+threading
