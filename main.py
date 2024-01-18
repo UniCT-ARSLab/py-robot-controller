@@ -1,6 +1,6 @@
 import can
 
-from robot.constants import CHANNEL, DEBUG_VIRTUAL, DEBUG_CAN, CAN_IDS
+from robot.constants import CAN_IDS, CHANNEL, DEBUG_VIRTUAL
 from robot.model import CAN_position
 from robot.robot import Robot
 from robot.virtual import get_v_bus, get_v_message

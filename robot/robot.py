@@ -2,7 +2,7 @@ import struct
 
 import can
 
-from robot.constants import DEBUG_CAN, CAN_IDS
+from robot.constants import CAN_IDS, DEBUG_CAN
 
 
 class Robot:
@@ -37,6 +37,6 @@ class Robot:
 
             if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
                 print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
-                
+
     def get_position(self):
         return self.Position
