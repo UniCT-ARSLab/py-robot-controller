@@ -4,22 +4,21 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "!README.md"
-      - "!.gitignore"
+    paths-ignore:
+      - "**/*.md"
+      - "**/.gitignore"
 
   pull_request:
-    paths:
-      - "!README.md"
-      - "!.gitignore"
+    paths-ignore:
+      - "**/*.md"
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.9", "3.10"]
+        os: [ubuntu-latest]
+        python-version: ["3.10"]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +32,7 @@ jobs:
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
 
       - name: Lint with pylint
-        run: pylint webserver models tests
+        run: pylint webserver robot models tests
 
       - name: Lint with flake8
         run: |
