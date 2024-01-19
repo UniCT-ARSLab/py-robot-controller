@@ -11,6 +11,7 @@ app = Flask(__name__)
 # Get robot position
 @app.route('/robot/position', methods=['GET'])
 def get_robot_position():
+    return 'this is position';
     pass
 
 # Set robot position
@@ -79,7 +80,7 @@ async def echo(websocket: WebSocketServerProtocol) -> None:
             # await websocket.send(robot.get_lidar_data())
             await websocket.send('this is lidar mex')
         else:
-            await websocket.send(message)
+            await websocket.send('echo: ' + message)
 
 async def start_websocket(port: int) -> None:
     async with serve(echo, "localhost", port):
