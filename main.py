@@ -1,9 +1,17 @@
+import threading
+
 import can
 
-from robot.constants import CAN_IDS, CHANNEL, DEBUG_VIRTUAL
-from robot.model import CAN_position
+from models.can_packet import CAN_position
+from robot.constants import CAN_IDS, CHANNEL, DEBUG_CAN, DEBUG_VIRTUAL
 from robot.robot import Robot
 from robot.virtual import get_v_bus, get_v_message
+from webserver.webserver import start_webservices
+
+robot = Robot()
+
+# run webserver asynchronously in a separate thread
+threading.Thread(target=start_webservices).start()
 
 _bustype='socketcan' if not DEBUG_VIRTUAL else 'virtual'
 bus = can.interface.Bus(channel=CHANNEL, bustype=_bustype)
@@ -17,12 +25,15 @@ if DEBUG_VIRTUAL:
     v_bus.send(v_message)
     v_bus.send(v_messageUnk)
 
-robot = Robot()
+robot.init_lidar()
 
 try:
     while True:
+        robot.get_lidar_data()
+
         message = bus.recv()
-        print(message)
+        if DEBUG_CAN:
+            print(message)
 
         if message is not None:
             try:

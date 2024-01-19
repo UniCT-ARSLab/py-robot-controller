@@ -1,15 +1,21 @@
 import struct
 
 import can
+from breezylidar import URG04LX
 
-from robot.constants import CAN_IDS, DEBUG_CAN
+from models.can_packet import Position
+from models.lidar_mock import SCANDATA_MOCK
+from robot.constants import CAN_IDS, DEBUG_CAN, DEBUG_LIDAR, DEBUG_VIRTUAL, LIDAR_DEVICE
 
 
 class Robot:
     def __init__(self):
+        self.laser_data = []
+        self.laser = None
+
         # Initialize the starting and current positions of the robot
         self.StartPosition = {"X": -1000, "Y": -1000, "Angle": 0}
-        self.Position = {"X": 0, "Y": 0, "Angle": 0}
+        self.Position: Position = {"X": 0, "Y": 0, "Angle": 0}
 
     def on_data_received(self, frm: can.Message):
         # Extract data from the CAN message
@@ -38,5 +44,19 @@ class Robot:
             if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
                 print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
 
-    def get_position(self):
+    def get_position(self) -> Position:
         return self.Position
+
+    def init_lidar(self) -> None:
+        if not DEBUG_VIRTUAL:
+            self.laser = URG04LX(LIDAR_DEVICE)
+
+    def get_lidar_data(self) -> None:
+        if DEBUG_VIRTUAL:
+            laser_data = SCANDATA_MOCK
+        else:
+            laser_data = self.laser.getScan()
+
+        if laser_data:
+            if DEBUG_LIDAR:
+                print(laser_data)

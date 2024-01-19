@@ -1,4 +1,10 @@
+import asyncio
+
 from flask import Flask
+from websockets import WebSocketServerProtocol
+from websockets.server import serve
+
+# from robot.robot import Robot
 
 app = Flask(__name__)
 
@@ -67,5 +73,22 @@ def robot_align():
 def robot_starter_toggle():
     pass
 
+async def echo(websocket: WebSocketServerProtocol) -> None:
+    async for message in websocket:
+        if message == 'lidar':
+            # await websocket.send(robot.get_lidar_data())
+            await websocket.send('this is lidar mex')
+        else:
+            await websocket.send(message)
+
+async def start_websocket(port: int) -> None:
+    async with serve(echo, "localhost", port):
+        await asyncio.Future()  # run forever
+
+def start_webservices() -> None:
+    asyncio.run(start_websocket(8765))
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    start_webservices()

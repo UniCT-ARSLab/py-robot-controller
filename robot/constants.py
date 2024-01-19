@@ -1,6 +1,9 @@
 DEBUG_CAN = True
+DEBUG_LIDAR = True
 DEBUG_VIRTUAL = True
+
 CHANNEL = 'can0'
+LIDAR_DEVICE = '/dev/ttyACM0'
 
 CAN_IDS = {
     'ROBOT_POSITION': 0x3E3,
