@@ -15,7 +15,7 @@ class Robot:
 
         # Initialize the starting and current positions of the robot
         self.StartPosition = {"X": -1000, "Y": -1000, "Angle": 0}
-        self.Position = {"X": 0, "Y": 0, "Angle": 0}
+        self.Position: Position = {"X": 0, "Y": 0, "Angle": 0}
 
     def on_data_received(self, frm: can.Message):
         # Extract data from the CAN message
