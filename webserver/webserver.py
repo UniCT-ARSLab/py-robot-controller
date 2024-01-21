@@ -1,13 +1,11 @@
 import asyncio
-import threading
 
-from rest_api import app
-from websocket import start_websocket
+from webserver.rest_api import app
+from webserver.websocket import start_websocket
 
 
-def start_webservices() -> None:
+def start_socket() -> None:
     asyncio.run(start_websocket("localhost", 8765))
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
-if __name__ == '__main__':
-    start_webservices()
+def start_rest_api() -> None:
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
