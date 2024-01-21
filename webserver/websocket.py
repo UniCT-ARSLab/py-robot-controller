@@ -36,4 +36,3 @@ def get_lidar_data() -> str:
         "data": robot.get_lidar_data(),
     }
     return json.dumps(laser_data_msg)
-

@@ -62,8 +62,7 @@ class Robot:
             if DEBUG_LIDAR:
                 print(laser_data)
             return laser_data
-        
+
         return []
-            
-# TODO: singleton
+
 robot = Robot()
