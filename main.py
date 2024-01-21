@@ -4,14 +4,13 @@ import can
 
 from models.can_packet import CAN_position
 from robot.constants import CAN_IDS, CHANNEL, DEBUG_CAN, DEBUG_VIRTUAL
-from robot.robot import Robot
+from robot.robot import robot
 from robot.virtual import get_v_bus, get_v_message
-from webserver.webserver import start_webservices
-
-robot = Robot()
+from webserver.webserver import start_rest_api, start_socket
 
 # run webserver asynchronously in a separate thread
-threading.Thread(target=start_webservices).start()
+threading.Thread(target=start_socket).start()
+threading.Thread(target=start_rest_api).start()
 
 _bustype='socketcan' if not DEBUG_VIRTUAL else 'virtual'
 bus = can.interface.Bus(channel=CHANNEL, bustype=_bustype)
