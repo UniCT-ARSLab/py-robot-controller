@@ -1,94 +1,13 @@
 import asyncio
+import threading
 
-from flask import Flask
-from websockets import WebSocketServerProtocol
-from websockets.server import serve
+from rest_api import app
+from websocket import start_websocket
 
-# from robot.robot import Robot
-
-app = Flask(__name__)
-
-# Get robot position
-@app.route('/robot/position', methods=['GET'])
-def get_robot_position():
-    pass
-
-# Set robot position
-@app.route('/robot/position', methods=['POST'])
-def set_robot_position():
-    pass
-
-# Get robot battery percentage
-@app.route('/robot/battery', methods=['GET'])
-def get_robot_battery():
-    pass
-
-# Reset robot context
-@app.route('/robot/reset', methods=['GET'])
-def reset_robot_context():
-    pass
-
-# Get robot speed
-@app.route('/robot/speed', methods=['GET'])
-def get_robot_speed():
-    pass
-
-# Set robot speed
-@app.route('/robot/speed', methods=['POST'])
-def set_robot_speed():
-    pass
-
-# Move robot forward by a certain distance
-@app.route('/robot/move/distance', methods=['POST'])
-def robot_forward_distance():
-    pass
-
-# Move robot forward to a specific point
-@app.route('/robot/move/point', methods=['POST'])
-def robot_forward_point():
-    pass
-
-# Rotate robot relative to its current orientation
-@app.route('/robot/rotate/relative', methods=['POST'])
-def robot_relative_rotation():
-    pass
-
-# Rotate robot to an absolute angle
-@app.route('/robot/rotate/absolute', methods=['POST'])
-def robot_absolute_rotation():
-    pass
-
-# Stop robot motors
-@app.route('/robot/motors/stop', methods=['POST'])
-def send_stop():
-    pass
-
-# Align robot to a specified color
-@app.route('/robot/st/align', methods=['POST'])
-def robot_align():
-    pass
-
-# Toggle robot starter (enable/disable)
-@app.route('/robot/st/starter', methods=['POST'])
-def robot_starter_toggle():
-    pass
-
-async def echo(websocket: WebSocketServerProtocol) -> None:
-    async for message in websocket:
-        if message == 'lidar':
-            # await websocket.send(robot.get_lidar_data())
-            await websocket.send('this is lidar mex')
-        else:
-            await websocket.send(message)
-
-async def start_websocket(port: int) -> None:
-    async with serve(echo, "localhost", port):
-        await asyncio.Future()  # run forever
 
 def start_webservices() -> None:
-    asyncio.run(start_websocket(8765))
+    asyncio.run(start_websocket("localhost", 8765))
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
-
 
 if __name__ == '__main__':
     start_webservices()

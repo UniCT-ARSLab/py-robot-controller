@@ -1,4 +1,5 @@
 import struct
+from typing import List
 
 import can
 from breezylidar import URG04LX
@@ -14,7 +15,7 @@ class Robot:
         self.laser = None
 
         # Initialize the starting and current positions of the robot
-        self.StartPosition = {"X": -1000, "Y": -1000, "Angle": 0}
+        self.StartPosition: Position = {"X": -1000, "Y": -1000, "Angle": 0}
         self.Position: Position = {"X": 0, "Y": 0, "Angle": 0}
 
     def on_data_received(self, frm: can.Message):
@@ -51,7 +52,7 @@ class Robot:
         if not DEBUG_VIRTUAL:
             self.laser = URG04LX(LIDAR_DEVICE)
 
-    def get_lidar_data(self) -> None:
+    def get_lidar_data(self) -> List[int]:
         if DEBUG_VIRTUAL:
             laser_data = SCANDATA_MOCK
         else:
@@ -60,3 +61,9 @@ class Robot:
         if laser_data:
             if DEBUG_LIDAR:
                 print(laser_data)
+            return laser_data
+        
+        return []
+            
+# TODO: singleton
+robot = Robot()
