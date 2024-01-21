@@ -1,4 +1,5 @@
 import struct
+from typing import List
 
 import can
 from breezylidar import URG04LX
@@ -75,3 +76,8 @@ class Robot:
         if laser_data:
             if DEBUG_LIDAR:
                 print(laser_data)
+            return laser_data
+
+        return []
+
+robot = Robot()
