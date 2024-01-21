@@ -17,3 +17,12 @@ CAN_IDS = {
     'ST_CMD': 0x710,
     'OBST_MAP': 0x70F
 }
+
+MOTION_CMDS = {
+    'STOP': 0x82,
+    'BRAKE': 0x83,
+    'SET_POSITION': 0x84,
+    'FW_TO_DISTANCE': 0x85,
+    'ROTATE_RELATIVE': 0x88,
+    'SET_SPEED': 0x8C,
+}

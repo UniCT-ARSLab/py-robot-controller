@@ -1,4 +1,5 @@
 from typing import TypedDict, Union
+import struct
 
 
 class Position(TypedDict):
@@ -11,3 +12,14 @@ CAN_position: Position = {
     "Y": 20,
     "angle": 300,
 }
+
+class MotionCommand:
+    def __init__(self, CMD: int, PARAM_1: int, PARAM_2: int, PARAM_3: int, flags: int):
+        self.CMD = CMD
+        self.PARAM_1 = PARAM_1
+        self.PARAM_2 = PARAM_2
+        self.PARAM_3 = PARAM_3
+        self.flags = flags
+
+    def get_struct(self) -> bytes:
+        return struct.pack("<BhhhB", self.CMD, self.PARAM_1, self.PARAM_2, self.PARAM_3, self.flags)

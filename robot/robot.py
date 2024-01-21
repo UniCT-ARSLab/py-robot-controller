@@ -4,9 +4,9 @@ from typing import List
 import can
 from breezylidar import URG04LX
 
-from models.can_packet import Position
+from models.can_packet import Position, MotionCommand
 from models.lidar_mock import SCANDATA_MOCK
-from robot.constants import CAN_IDS, DEBUG_CAN, DEBUG_VCAN, DEBUG_LIDAR, DEBUG_VIRTUAL, LIDAR_DEVICE, CHANNEL, VCHANNEL
+from robot.constants import CAN_IDS, DEBUG_CAN, DEBUG_VCAN, DEBUG_LIDAR, DEBUG_VIRTUAL, LIDAR_DEVICE, CHANNEL, VCHANNEL, MOTION_CMDS
 
 
 class Robot:
@@ -73,7 +73,8 @@ class Robot:
 
         :return: None
         """
-        data = struct.pack("<hhh", position["X"], position["Y"], position["Angle"])
+        mc = MotionCommand(MOTION_CMDS['SET_POSITION'], position["X"], position["Y"], position["Angle"], 0)
+        data = mc.get_struct()
         msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, extended_id=False)
         self.bus.send(msg)
     def set_position(self, x: int, y: int, angle: int) -> None:
@@ -89,8 +90,23 @@ class Robot:
 
         :return: None
         """
-        data = struct.pack("<hhh", x, y, angle)
+        mc = MotionCommand(MOTION_CMDS['SET_POSITION'], x, y, angle, 0)
+        data = mc.get_struct()
         msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, extended_id=False)
+        self.bus.send(msg)
+
+    def set_speed(self, speed: int) -> None:
+        """
+        Set the speed of the robot.
+
+        :param speed: Speed of the robot.
+        :type speed: int
+
+        :return: None
+        """
+        mc = MotionCommand(MOTION_CMDS['SET_SPEED'], speed, 0, 0, 0)
+        data = mc.get_struct()
+        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data, extended_id=False)
         self.bus.send(msg)
 
     def init_lidar(self) -> None:
