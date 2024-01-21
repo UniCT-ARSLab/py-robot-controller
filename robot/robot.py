@@ -25,6 +25,13 @@ class Robot:
         self.Position: Position = {"X": 0, "Y": 0, "Angle": 0}
 
     def on_data_received(self, frm: can.Message):
+        """
+        Handle the data received from the CAN bus depending on the CAN ID.
+        this has to be called in a loop at the moment, but it should be changed to a callback somehow
+        :param frm: The CAN message received.
+        :type frm: can.Message
+        :return: None
+        """
         # Extract data from the CAN message
         data = frm.data
 
@@ -55,19 +62,50 @@ class Robot:
         return self.Position
     
     def set_position(self, position: Position) -> None:
+        """
+        Set the position of the robot using a Position object.
+
+        :param position: A Position object containing X, Y, and Angle values.
+        :type position: dict
+        :key position["X"]: X-coordinate of the robot.
+        :key position["Y"]: Y-coordinate of the robot.
+        :key position["Angle"]: Angle of the robot.
+
+        :return: None
+        """
         data = struct.pack("<hhh", position["X"], position["Y"], position["Angle"])
         msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, extended_id=False)
         self.bus.send(msg)
     def set_position(self, x: int, y: int, angle: int) -> None:
+        """
+        Set the position of the robot using individual X, Y, and Angle values.
+
+        :param x: X-coordinate of the robot.
+        :type x: int
+        :param y: Y-coordinate of the robot.
+        :type y: int
+        :param angle: Angle of the robot.
+        :type angle: int
+
+        :return: None
+        """
         data = struct.pack("<hhh", x, y, angle)
         msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, extended_id=False)
         self.bus.send(msg)
 
     def init_lidar(self) -> None:
+        """
+        Initialize the lidar object of the robot using the LIDAR_DEVICE constant.
+        :return: None
+        """
         if not DEBUG_VIRTUAL and not DEBUG_VCAN:
             self.laser = URG04LX(LIDAR_DEVICE)
 
     def get_lidar_data(self) -> None:
+        """
+        Get the data from the lidar. If DEBUG_VIRTUAL or DEBUG_VCAN are True, the data is mocked.
+        :return: None
+        """
         if DEBUG_VIRTUAL or DEBUG_VCAN:
             laser_data = SCANDATA_MOCK
         else:
