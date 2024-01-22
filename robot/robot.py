@@ -1,11 +1,12 @@
 import struct
+from random import randrange
 from typing import List
 
 import can
 from breezylidar import URG04LX
 
 from models.can_packet import Position
-from models.lidar_mock import SCANDATA_MOCK
+from models.lidar_mock import SCANDATA_MOCKS
 from robot.constants import CAN_IDS, DEBUG_CAN, DEBUG_LIDAR, DEBUG_VIRTUAL, LIDAR_DEVICE
 
 
@@ -54,7 +55,8 @@ class Robot:
 
     def get_lidar_data(self) -> List[int]:
         if DEBUG_VIRTUAL:
-            laser_data = SCANDATA_MOCK
+            index = randrange(0, len(SCANDATA_MOCKS))
+            laser_data = SCANDATA_MOCKS[index]
         else:
             laser_data = self.laser.getScan()
 

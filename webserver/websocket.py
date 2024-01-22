@@ -20,8 +20,6 @@ async def handler(websocket: WebSocketServerProtocol):
 async def broadcast():
     while True:
         print(f"clients = {len(CLIENTS)}")
-        message = 'this is a broadcast message'
-        websockets.broadcast(CLIENTS, message)
         websockets.broadcast(CLIENTS, get_lidar_data())
         await asyncio.sleep(1) # delay
         print()
