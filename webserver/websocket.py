@@ -39,7 +39,7 @@ def get_lidar_data() -> str:
     return json.dumps(laser_data_msg)
 
 def get_robot_position() -> str:
-    # TODO: remove mocks
+    # to do: remove mocks
     index = randrange(0, len(position_mocks))
     position_data = position_mocks[index]
 
