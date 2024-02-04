@@ -1,5 +1,5 @@
 DEBUG_CAN = True
-DEBUG_LIDAR = True
+DEBUG_LIDAR = False
 DEBUG_VIRTUAL = True
 DEBUG_VCAN = False
 

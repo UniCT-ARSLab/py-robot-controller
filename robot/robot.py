@@ -1,12 +1,23 @@
 import struct
+from random import randrange
 from typing import List
 
 import can
 from breezylidar import URG04LX
 
-from models.can_packet import Position, MotionCommand
-from models.lidar_mock import SCANDATA_MOCK
-from robot.constants import CAN_IDS, DEBUG_CAN, DEBUG_VCAN, DEBUG_LIDAR, DEBUG_VIRTUAL, LIDAR_DEVICE, CHANNEL, VCHANNEL, MOTION_CMDS
+from models.can_packet import MotionCommand, Position
+from models.lidar_mock import SCANDATA_MOCKS
+from robot.constants import (
+    CAN_IDS,
+    CHANNEL,
+    DEBUG_CAN,
+    DEBUG_LIDAR,
+    DEBUG_VCAN,
+    DEBUG_VIRTUAL,
+    LIDAR_DEVICE,
+    MOTION_CMDS,
+    VCHANNEL,
+)
 
 
 class Robot:
@@ -117,13 +128,14 @@ class Robot:
         if not DEBUG_VIRTUAL and not DEBUG_VCAN:
             self.laser = URG04LX(LIDAR_DEVICE)
 
-    def get_lidar_data(self) -> None:
+    def get_lidar_data(self) -> List[int]:
         """
         Get the data from the lidar. If DEBUG_VIRTUAL or DEBUG_VCAN are True, the data is mocked.
-        :return: None
+        :return: List[int]
         """
         if DEBUG_VIRTUAL or DEBUG_VCAN:
-            laser_data = SCANDATA_MOCK
+            index = randrange(0, len(SCANDATA_MOCKS))
+            laser_data = SCANDATA_MOCKS[index]
         else:
             laser_data = self.laser.getScan()
 
