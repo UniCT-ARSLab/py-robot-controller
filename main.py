@@ -3,7 +3,7 @@ import threading
 import can
 
 from models.can_packet import CAN_position
-from robot.constants import CAN_IDS, CHANNEL, DEBUG_CAN, DEBUG_VIRTUAL
+from robot.constants import CAN_IDS, CHANNEL, VCHANNEL, DEBUG_CAN, DEBUG_VIRTUAL, DEBUG_VCAN
 from robot.robot import robot
 from robot.virtual import get_v_bus, get_v_message
 from webserver.webserver import start_rest_api, start_socket
@@ -12,8 +12,13 @@ from webserver.webserver import start_rest_api, start_socket
 threading.Thread(target=start_socket).start()
 threading.Thread(target=start_rest_api).start()
 
-_bustype='socketcan' if not DEBUG_VIRTUAL else 'virtual'
-bus = can.interface.Bus(channel=CHANNEL, bustype=_bustype)
+_bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
+_channel = VCHANNEL if DEBUG_VCAN else CHANNEL
+bus = can.interface.Bus(channel=_channel, bustype=_bustype)
+
+if DEBUG_CAN:
+    print(f"Bus type: {_bustype}")
+    print(f"Channel: {_channel}")
 
 if DEBUG_VIRTUAL:
     v_bus = get_v_bus(CHANNEL)
@@ -23,6 +28,13 @@ if DEBUG_VIRTUAL:
 
     v_bus.send(v_message)
     v_bus.send(v_messageUnk)
+
+if DEBUG_VCAN:
+    v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], "<hhh", CAN_position)
+    v_messageUnk = get_v_message(0x333, "<hhh", CAN_position)
+
+    bus.send(v_message)
+    bus.send(v_messageUnk)
 
 robot.init_lidar()
 
