@@ -1,5 +1,5 @@
-from typing import TypedDict, Union
 import struct
+from typing import TypedDict, Union
 
 
 class Position(TypedDict):
@@ -14,7 +14,8 @@ CAN_position: Position = {
 }
 
 class MotionCommand:
-    def __init__(self, CMD: int, PARAM_1: int, PARAM_2: int, PARAM_3: int, flags: int):
+    # pylint: disable=too-many-arguments
+    def __init__(self, CMD: int, PARAM_1: int, PARAM_2: int, PARAM_3: int, flags: int) -> None:
         self.CMD = CMD
         self.PARAM_1 = PARAM_1
         self.PARAM_2 = PARAM_2
