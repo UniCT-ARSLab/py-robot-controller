@@ -100,7 +100,7 @@ class Robot:
         """
         mc = MotionCommand(MOTION_CMDS['SET_SPEED'], speed, 0, 0, 0)
         data = mc.get_struct()
-        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data,)
+        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data, is_extended_id=False)
         self.bus.send(msg)
 
     def init_lidar(self) -> None:
