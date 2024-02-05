@@ -1,4 +1,4 @@
-from models.interfaces import Position
+from models.interfaces import Position, Velocity
 
 CAN_IDS = {
     'ROBOT_POSITION': 0x3E3,
@@ -20,10 +20,11 @@ MOTION_CMDS = {
     'SET_SPEED': 0x8C,
 }
 
-
 CAN_FORMATS = {
-    "POSITION": "<hhhBB"
+    "POSITION": "<hhhBB",
+    "VELOCITY": "<hp",
 }
+
 CAN_position: Position = {
     "X": 10,
     "Y": 20,
@@ -32,7 +33,7 @@ CAN_position: Position = {
     "Bumpers": 0,
 }
 
-CAN_velocity = {
+CAN_velocity: Velocity = {
     "linear_speed": 0,
-    "padding": [1, 2, 3, 4, 5, 6]
+    "padding": bytearray('123456', 'utf-8')
 }

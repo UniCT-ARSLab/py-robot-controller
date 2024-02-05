@@ -52,25 +52,39 @@ class Robot:
             return
 
         if frm.arbitration_id == CAN_IDS["ROBOT_POSITION"]:
-            posX, posY, angle, flags, bumpers = struct.unpack(CAN_FORMATS["POSITION"], data)
+            self.__handle_position(data)
+        elif frm.arbitration_id == CAN_IDS["ROBOT_SPEED"]:
+            self.__handle_speed(data)
 
-            # Convert the angle to a float by dividing by 100
-            angle /= 100.0
+    def __handle_position(self, data: bytearray) -> None:
+        posX, posY, angle, flags, bumpers = struct.unpack(CAN_FORMATS["POSITION"], data)
 
-            # Update the robot's position information
-            if self.StartPosition["X"] < -999:
-                self.StartPosition["X"] = posX
-                self.StartPosition["Y"] = posY
-                self.StartPosition["Angle"] = angle
+        # Convert the angle to a float by dividing by 100
+        angle /= 100.0
 
-            self.Position["X"] = posX
-            self.Position["Y"] = posY
-            self.Position["Angle"] = angle
-            self.Position["Flags"] = flags
-            self.Position["Bumpers"] = bumpers
+        # Update the robot's position information
+        if self.StartPosition["X"] < -999:
+            self.StartPosition["X"] = posX
+            self.StartPosition["Y"] = posY
+            self.StartPosition["Angle"] = angle
 
-            if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
-                print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
+        self.Position["X"] = posX
+        self.Position["Y"] = posY
+        self.Position["Angle"] = angle
+        self.Position["Flags"] = flags
+        self.Position["Bumpers"] = bumpers
+
+        if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
+            print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
+
+
+    def __handle_speed(self, data: bytearray) -> None:
+        linear_speed, padding = struct.unpack(CAN_FORMATS["VELOCITY"], data)
+        print('linear_speed', linear_speed)
+        print('padding')
+        print(padding)
+
+
 
     def get_position(self) -> Position:
         return self.Position

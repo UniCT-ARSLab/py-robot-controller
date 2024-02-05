@@ -2,7 +2,7 @@ import threading
 
 import can
 
-from models.can_packet import CAN_FORMATS, CAN_IDS, CAN_position
+from models.can_packet import CAN_FORMATS, CAN_IDS, CAN_position, CAN_velocity
 from robot.config import (
     CAN_BAUD,
     CHANNEL,
@@ -29,15 +29,18 @@ if DEBUG_CAN:
 
 if DEBUG_VIRTUAL or DEBUG_VCAN:
     v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], CAN_FORMATS["POSITION"], CAN_position)
+    v_message_velocity = get_v_message(CAN_IDS["ROBOT_SPEED"], CAN_FORMATS["VELOCITY"], CAN_velocity)
     v_messageUnk = get_v_message(0x333, "<hhhBB", { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5 })
 
 if DEBUG_VIRTUAL:
     v_bus = get_v_bus(CHANNEL)
     v_bus.send(v_message)
+    v_bus.send(v_message_velocity)
     v_bus.send(v_messageUnk)
 
 if DEBUG_VCAN:
     bus.send(v_message)
+    bus.send(v_message_velocity)
     bus.send(v_messageUnk)
 
 robot.init_lidar()

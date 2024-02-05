@@ -7,3 +7,7 @@ class Position(TypedDict):
     Angle: Union[float, int]
     Flags: int
     Bumpers: int
+
+class Velocity(TypedDict):
+    linear_speed: int
+    padding: bytearray
