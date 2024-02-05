@@ -71,7 +71,7 @@ class Robot:
 
     def get_position(self) -> Position:
         return self.Position
-    
+
     def set_position(self, position: Position) -> None:
         """
         Set the position of the robot using a Position object.
@@ -86,24 +86,7 @@ class Robot:
         """
         mc = MotionCommand(MOTION_CMDS['SET_POSITION'], position["X"], position["Y"], position["Angle"], 0)
         data = mc.get_struct()
-        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, extended_id=False)
-        self.bus.send(msg)
-    def set_position(self, x: int, y: int, angle: int) -> None:
-        """
-        Set the position of the robot using individual X, Y, and Angle values.
-
-        :param x: X-coordinate of the robot.
-        :type x: int
-        :param y: Y-coordinate of the robot.
-        :type y: int
-        :param angle: Angle of the robot.
-        :type angle: int
-
-        :return: None
-        """
-        mc = MotionCommand(MOTION_CMDS['SET_POSITION'], x, y, angle, 0)
-        data = mc.get_struct()
-        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, extended_id=False)
+        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, is_extended_id=False)
         self.bus.send(msg)
 
     def set_speed(self, speed: int) -> None:
@@ -117,7 +100,7 @@ class Robot:
         """
         mc = MotionCommand(MOTION_CMDS['SET_SPEED'], speed, 0, 0, 0)
         data = mc.get_struct()
-        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data, extended_id=False)
+        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data,)
         self.bus.send(msg)
 
     def init_lidar(self) -> None:
