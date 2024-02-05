@@ -1,6 +1,6 @@
 import struct
 from random import randrange
-from typing import List
+from typing import Any, List, Union
 
 import can
 from breezylidar import URG04LX
@@ -29,7 +29,7 @@ class Robot:
 
         # Initialize the lidar
         self.laser_data = []
-        self.laser = None
+        self.laser: Any = None
 
         # Initialize the starting and current positions of the robot
         self.StartPosition: Position = {"X": -1000, "Y": -1000, "Angle": 0}
