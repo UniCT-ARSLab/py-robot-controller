@@ -2,9 +2,9 @@ import threading
 
 import can
 
-from models.can_packet import CAN_position
-from robot.constants import (
-    CAN_IDS,
+from models.can_packet import CAN_FORMATS, CAN_IDS, CAN_position
+from robot.config import (
+    CAN_BAUD,
     CHANNEL,
     DEBUG_CAN,
     DEBUG_VCAN,
@@ -21,25 +21,22 @@ threading.Thread(target=start_rest_api).start()
 
 _bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
 _channel = VCHANNEL if DEBUG_VCAN else CHANNEL
-bus = can.interface.Bus(channel=_channel, bustype=_bustype)
+bus = can.interface.Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
 
 if DEBUG_CAN:
     print(f"Bus type: {_bustype}")
     print(f"Channel: {_channel}")
 
+if DEBUG_VIRTUAL or DEBUG_VCAN:
+    v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], CAN_FORMATS["POSITION"], CAN_position)
+    v_messageUnk = get_v_message(0x333, "<hhhBB", { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5 })
+
 if DEBUG_VIRTUAL:
     v_bus = get_v_bus(CHANNEL)
-
-    v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], "<hhh", CAN_position)
-    v_messageUnk = get_v_message(0x333, "<hhh", CAN_position)
-
     v_bus.send(v_message)
     v_bus.send(v_messageUnk)
 
 if DEBUG_VCAN:
-    v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], "<hhh", CAN_position)
-    v_messageUnk = get_v_message(0x333, "<hhh", CAN_position)
-
     bus.send(v_message)
     bus.send(v_messageUnk)
 
@@ -51,7 +48,7 @@ try:
 
         message = bus.recv()
         if DEBUG_CAN:
-            print(message)
+            print("\n", message)
 
         if message is not None:
             try:
