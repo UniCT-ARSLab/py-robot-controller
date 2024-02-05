@@ -1,6 +1,6 @@
 import struct
 from random import randrange
-from typing import Any, List, Union
+from typing import Any, List
 
 import can
 from breezylidar import URG04LX
