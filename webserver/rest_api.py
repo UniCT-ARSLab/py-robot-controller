@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # healthcheck
 @app.route('/healthcheck', methods=['GET'])
-def healthcheck():
+def healthcheck() -> str:
     return HEALTHCHECK_MESSAGE
 
 # Get robot position
