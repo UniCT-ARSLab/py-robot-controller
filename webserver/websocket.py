@@ -1,7 +1,6 @@
 
 import asyncio
 import json
-from random import randrange
 
 import websockets
 from websockets import WebSocketServerProtocol, serve

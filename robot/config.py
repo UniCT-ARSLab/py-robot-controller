@@ -7,4 +7,3 @@ CHANNEL = 'can0'
 VCHANNEL = 'vcan0'
 LIDAR_DEVICE = '/dev/ttyACM0'
 CAN_BAUD = 403847
-
