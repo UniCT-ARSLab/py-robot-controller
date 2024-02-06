@@ -1,6 +1,13 @@
 from flask import Flask
 
+from models.constants import HEALTHCHECK_MESSAGE
+
 app = Flask(__name__)
+
+# healthcheck
+@app.route('/healthcheck', methods=['GET'])
+def healthcheck() -> str:
+    return HEALTHCHECK_MESSAGE
 
 # Get robot position
 @app.route('/robot/position', methods=['GET'])

@@ -3,7 +3,14 @@ import threading
 import can
 
 from models.can_packet import CAN_position
-from robot.constants import CAN_IDS, CHANNEL, VCHANNEL, DEBUG_CAN, DEBUG_VIRTUAL, DEBUG_VCAN
+from robot.constants import (
+    CAN_IDS,
+    CHANNEL,
+    DEBUG_CAN,
+    DEBUG_VCAN,
+    DEBUG_VIRTUAL,
+    VCHANNEL,
+)
 from robot.robot import robot
 from robot.virtual import get_v_bus, get_v_message
 from webserver.webserver import start_rest_api, start_socket
