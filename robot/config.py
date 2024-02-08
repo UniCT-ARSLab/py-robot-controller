@@ -1,0 +1,9 @@
+DEBUG_CAN = True
+DEBUG_LIDAR = False
+DEBUG_VIRTUAL = True
+DEBUG_VCAN = False
+
+CHANNEL = 'can0'
+VCHANNEL = 'vcan0'
+LIDAR_DEVICE = '/dev/ttyACM0'
+CAN_BAUD = 403847

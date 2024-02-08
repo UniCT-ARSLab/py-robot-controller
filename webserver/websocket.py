@@ -1,12 +1,10 @@
 
 import asyncio
 import json
-from random import randrange
 
 import websockets
 from websockets import WebSocketServerProtocol, serve
 
-from models.socket import position_mocks
 from robot.robot import robot
 
 CLIENTS = set()
@@ -21,11 +19,10 @@ async def handler(websocket: WebSocketServerProtocol):
 
 async def broadcast():
     while True:
-        print(f"clients = {len(CLIENTS)}")
+        # print(f"clients = {len(CLIENTS)}")
         websockets.broadcast(CLIENTS, get_lidar_data())
         websockets.broadcast(CLIENTS, get_robot_position())
         await asyncio.sleep(1) # delay
-        print()
 
 async def start_websocket(host: str, port: int):
     async with serve(handler, host, port):
@@ -39,13 +36,8 @@ def get_lidar_data() -> str:
     return json.dumps(laser_data_msg)
 
 def get_robot_position() -> str:
-    # to do: remove mocks
-    index = randrange(0, len(position_mocks))
-    position_data = position_mocks[index]
-
     robot_position_msg = {
         "type": "position",
-        # "data": robot.get_position(),
-        "data": position_data,
+        "data": robot.get_position(),
     }
     return json.dumps(robot_position_msg)
