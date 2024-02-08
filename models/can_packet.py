@@ -34,5 +34,5 @@ CAN_position: Position = {
 }
 
 CAN_velocity: Velocity = {
-    "linear_speed": 0
+    "linear_speed": 10
 }

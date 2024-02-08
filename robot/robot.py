@@ -79,11 +79,10 @@ class Robot:
 
 
     def __handle_speed(self, data: bytearray) -> None:
-        linear_speed, padding = struct.unpack(CAN_FORMATS["VELOCITY"], data)
-        print('linear_speed', linear_speed)
-        print('padding')
-        print(padding)
-
+        linear_speed = struct.unpack(CAN_FORMATS["VELOCITY"], data)
+        
+        if DEBUG_CAN:
+            print('linear_speed', linear_speed)
 
 
     def get_position(self) -> Position:
