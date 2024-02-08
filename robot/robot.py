@@ -51,7 +51,7 @@ class Robot:
             print(f"Unknown CAN ID: {frm.arbitration_id}")
             return
 
-        if frm.arbitration_id == CAN_IDS["ROBOT_POSITION"]:
+        if frm.arbitration_id == CAN_IDS["ROBOT_POSITION"] or frm.arbitration_id == CAN_IDS["OTHER_ROBOT_POSITION"]:
             self.__handle_position(data)
         elif frm.arbitration_id == CAN_IDS["ROBOT_SPEED"]:
             self.__handle_speed(data)
