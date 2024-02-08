@@ -22,7 +22,7 @@ MOTION_CMDS = {
 
 CAN_FORMATS = {
     "POSITION": "<hhhBB",
-    "VELOCITY": "<hp",
+    "VELOCITY": "<hxxxxxx",
 }
 
 CAN_position: Position = {
@@ -34,6 +34,5 @@ CAN_position: Position = {
 }
 
 CAN_velocity: Velocity = {
-    "linear_speed": 0,
-    "padding": bytearray('123456', 'utf-8')
+    "linear_speed": 0
 }

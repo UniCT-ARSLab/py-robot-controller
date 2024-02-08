@@ -10,4 +10,3 @@ class Position(TypedDict):
 
 class Velocity(TypedDict):
     linear_speed: int
-    padding: bytearray
