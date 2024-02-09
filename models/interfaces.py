@@ -10,3 +10,7 @@ class Position(TypedDict):
 
 class Velocity(TypedDict):
     linear_speed: int
+
+class RobotStatus(TypedDict):
+    robot_selected: int
+    status_display: int
