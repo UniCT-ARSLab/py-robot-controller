@@ -1,5 +1,10 @@
-from typing import TypedDict, Union
+from typing import Any, TypedDict, Union
 
+
+class VirtualMessages(TypedDict):
+    packet_id: int
+    format: str
+    data: Any
 
 class Position(TypedDict):
     X: int

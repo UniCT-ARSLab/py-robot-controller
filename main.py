@@ -1,15 +1,9 @@
 import threading
+from typing import List
 
 import can
 
-from models.can_packet import (
-    CAN_FORMATS,
-    CAN_IDS,
-    CAN_distance_sensor,
-    CAN_position,
-    CAN_robot_status,
-    CAN_velocity,
-)
+from models.debug_messages import virtual_messages
 from robot.config import (
     CAN_BAUD,
     CHANNEL,
@@ -35,29 +29,18 @@ if DEBUG_CAN:
     print(f"Channel: {_channel}")
 
 if DEBUG_VIRTUAL or DEBUG_VCAN:
-    v_message = get_v_message(CAN_IDS["ROBOT_POSITION"], CAN_FORMATS["POSITION"], CAN_position)
-    v_message_velocity = get_v_message(CAN_IDS["ROBOT_SPEED"], CAN_FORMATS["VELOCITY"], CAN_velocity)
-    v_message_other_position = get_v_message(CAN_IDS["OTHER_ROBOT_POSITION"], CAN_FORMATS["POSITION"], CAN_position)
-    v_message_robot_status = get_v_message(CAN_IDS["ROBOT_STATUS"], CAN_FORMATS["ROBOT_STATUS"], CAN_robot_status)
-    v_message_distance_sensor = get_v_message(CAN_IDS["DISTANCE_SENSOR"], CAN_FORMATS["DISTANCE_SENSOR"], CAN_distance_sensor)
-    v_messageUnk = get_v_message(0x333, "<hhhBB", { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5 })
+    v_messages: List[can.Message] = []
+    for v_message in virtual_messages:
+        v_messages.append(get_v_message(v_message["packet_id"], v_message["format"], v_message["data"]))
 
 if DEBUG_VIRTUAL:
     v_bus = get_v_bus(CHANNEL)
-    v_bus.send(v_message)
-    v_bus.send(v_message_velocity)
-    v_bus.send(v_message_other_position)
-    v_bus.send(v_message_robot_status)
-    v_bus.send(v_message_distance_sensor)
-    v_bus.send(v_messageUnk)
+    for virtual_message in v_messages:
+        v_bus.send(virtual_message)
 
 if DEBUG_VCAN:
-    bus.send(v_message)
-    bus.send(v_message_velocity)
-    bus.send(v_message_other_position)
-    bus.send(v_message_robot_status)
-    bus.send(v_message_distance_sensor)
-    bus.send(v_messageUnk)
+    for virtual_message in v_messages:
+        bus.send(virtual_message)
 
 robot.init_lidar()
 
