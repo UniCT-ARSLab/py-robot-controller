@@ -55,6 +55,11 @@ class Robot:
             self.__handle_position(data)
         elif frm.arbitration_id == CAN_IDS["ROBOT_SPEED"]:
             self.__handle_speed(data)
+        elif frm.arbitration_id == CAN_IDS["ROBOT_STATUS"]:
+            self.__handle_robot_status(data)
+        elif frm.arbitration_id == CAN_IDS["DISTANCE_SENSOR"]:
+            self.__handle_distance_sensor(data)
+
 
     def __handle_position(self, data: bytearray) -> None:
         posX, posY, angle, flags, bumpers = struct.unpack(CAN_FORMATS["POSITION"], data)
@@ -83,6 +88,23 @@ class Robot:
         
         if DEBUG_CAN:
             print('linear_speed', linear_speed)
+
+
+    def __handle_robot_status(self, data: bytearray) -> None:
+        robot_selected, status_display = struct.unpack(CAN_FORMATS["ROBOT_STATUS"], data)
+
+        if DEBUG_CAN:
+            print('robot_selected', robot_selected)
+            print('status_display', status_display)
+
+    def __handle_distance_sensor(self, data: bytearray) -> None:
+        sensor, distance, alarm = struct.unpack(CAN_FORMATS["DISTANCE_SENSOR"], data)
+
+        if DEBUG_CAN:
+            print('sensor', sensor)
+            print('distance', distance)
+            print('alarm', alarm)
+
 
 
     def get_position(self) -> Position:
