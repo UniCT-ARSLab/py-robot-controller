@@ -14,3 +14,8 @@ class Velocity(TypedDict):
 class RobotStatus(TypedDict):
     robot_selected: int
     status_display: int
+
+class DisanceSensor(TypedDict):
+    sensor: int
+    distance: int
+    alarm: int

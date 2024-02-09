@@ -1,4 +1,4 @@
-from models.interfaces import Position, RobotStatus, Velocity
+from models.interfaces import DisanceSensor, Position, RobotStatus, Velocity
 
 CAN_IDS = {
     'ROBOT_POSITION': 0x3E3,
@@ -24,6 +24,7 @@ CAN_FORMATS = {
     "POSITION": "<hhhBB",
     "VELOCITY": "<hxxxxxx",
     "ROBOT_STATUS": "<ii",
+    "DISTANCE_SENSOR": "<BHBxxxx",
 }
 
 CAN_position: Position = {
@@ -41,4 +42,10 @@ CAN_velocity: Velocity = {
 CAN_robot_status: RobotStatus = {
     "robot_selected": 10,
     "status_display": 20,
+}
+
+CAN_distance_sensor: DisanceSensor = {
+    "sensor": 1,
+    "distance": 10,
+    "alarm": 2,
 }
