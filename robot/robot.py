@@ -2,8 +2,9 @@ import struct
 from random import randrange
 from typing import Any, List
 
-import can
 from breezylidar import URG04LX
+from can import Message
+from can.interface import Bus
 
 from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS
 from models.interfaces import Position
@@ -26,7 +27,7 @@ class Robot:
         # Initialize the CAN bus
         _channel = VCHANNEL if DEBUG_VCAN else CHANNEL
         _bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
-        self.bus = can.interface.Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
+        self.bus = Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
 
         # Initialize the lidar
         self.laser_data = []
@@ -36,7 +37,7 @@ class Robot:
         self.StartPosition: Position = { "X": -1000, "Y": -1000, "Angle": 0, "Flags": 0, "Bumpers": 0 }
         self.Position: Position = { "X": 0, "Y": 0, "Angle": 0, "Flags": 0, "Bumpers": 0 }
 
-    def on_data_received(self, frm: can.Message) -> None:
+    def on_data_received(self, frm: Message) -> None:
         """
         Handle the data received from the CAN bus depending on the CAN ID.
         this has to be called in a loop at the moment, but it should be changed to a callback somehow
@@ -51,10 +52,15 @@ class Robot:
             print(f"Unknown CAN ID: {frm.arbitration_id}")
             return
 
-        if frm.arbitration_id == CAN_IDS["ROBOT_POSITION"]:
+        if frm.arbitration_id in (CAN_IDS["ROBOT_POSITION"], CAN_IDS["OTHER_ROBOT_POSITION"]):
             self.__handle_position(data)
         elif frm.arbitration_id == CAN_IDS["ROBOT_SPEED"]:
             self.__handle_speed(data)
+        elif frm.arbitration_id == CAN_IDS["ROBOT_STATUS"]:
+            self.__handle_robot_status(data)
+        elif frm.arbitration_id == CAN_IDS["DISTANCE_SENSOR"]:
+            self.__handle_distance_sensor(data)
+
 
     def __handle_position(self, data: bytearray) -> None:
         posX, posY, angle, flags, bumpers = struct.unpack(CAN_FORMATS["POSITION"], data)
@@ -79,10 +85,26 @@ class Robot:
 
 
     def __handle_speed(self, data: bytearray) -> None:
-        linear_speed, padding = struct.unpack(CAN_FORMATS["VELOCITY"], data)
-        print('linear_speed', linear_speed)
-        print('padding')
-        print(padding)
+        linear_speed = struct.unpack(CAN_FORMATS["VELOCITY"], data)
+
+        if DEBUG_CAN:
+            print('linear_speed', linear_speed)
+
+
+    def __handle_robot_status(self, data: bytearray) -> None:
+        robot_selected, status_display = struct.unpack(CAN_FORMATS["ROBOT_STATUS"], data)
+
+        if DEBUG_CAN:
+            print('robot_selected', robot_selected)
+            print('status_display', status_display)
+
+    def __handle_distance_sensor(self, data: bytearray) -> None:
+        sensor, distance, alarm = struct.unpack(CAN_FORMATS["DISTANCE_SENSOR"], data)
+
+        if DEBUG_CAN:
+            print('sensor', sensor)
+            print('distance', distance)
+            print('alarm', alarm)
 
 
 
@@ -103,7 +125,7 @@ class Robot:
         """
         mc = MotionCommand(MOTION_CMDS['SET_POSITION'], position["X"], position["Y"], position["Angle"], 0, 0)
         data = mc.get_struct()
-        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, is_extended_id=False, is_rx=False)
+        msg = Message(arbitration_id=CAN_IDS["ROBOT_POSITION"], data=data, is_extended_id=False, is_rx=False)
         self.bus.send(msg)
 
     def set_speed(self, speed: int) -> None:
@@ -117,7 +139,7 @@ class Robot:
         """
         mc = MotionCommand(MOTION_CMDS['SET_SPEED'], speed, 0, 0, 0, 0)
         data = mc.get_struct()
-        msg = can.Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data, is_extended_id=False, is_rx=False)
+        msg = Message(arbitration_id=CAN_IDS["ROBOT_MOTION_COMMAND"], data=data, is_extended_id=False, is_rx=False)
         self.bus.send(msg)
 
     def init_lidar(self) -> None:

@@ -1,6 +1,6 @@
-
 import asyncio
 import json
+from typing import Union
 
 import websockets
 from websockets import WebSocketServerProtocol, serve
@@ -24,9 +24,11 @@ async def broadcast():
         websockets.broadcast(CLIENTS, get_robot_position())
         await asyncio.sleep(1) # delay
 
-async def start_websocket(host: str, port: int):
+
+async def start_websocket(host: Union[str, None], port: int):
     async with serve(handler, host, port):
         await broadcast()
+
 
 def get_lidar_data() -> str:
     laser_data_msg = {
