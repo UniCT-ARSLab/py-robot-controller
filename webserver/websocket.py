@@ -21,7 +21,7 @@ async def broadcast():
     while True:
         # print(f"clients = {len(CLIENTS)}")
         websockets.broadcast(CLIENTS, get_lidar_data())
-        websockets.broadcast(CLIENTS, get_robot_position())
+        websockets.broadcast(CLIENTS, get_robot_data())
         await asyncio.sleep(1) # delay
 
 
@@ -37,9 +37,10 @@ def get_lidar_data() -> str:
     }
     return json.dumps(laser_data_msg)
 
-def get_robot_position() -> str:
+
+def get_robot_data() -> str:
     robot_position_msg = {
-        "type": "position",
-        "data": robot.get_position(),
+        "type": "robot_data",
+        "data": robot.get_robot_data(),
     }
     return json.dumps(robot_position_msg)

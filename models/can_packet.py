@@ -1,4 +1,4 @@
-from models.interfaces import DisanceSensor, Position, RobotStatus, Velocity
+from models.interfaces import DistanceSensor, Position, RobotStatus, Velocity
 
 CAN_IDS = {
     'ROBOT_POSITION': 0x3E3,
@@ -44,7 +44,7 @@ CAN_robot_status: RobotStatus = {
     "status_display": 20,
 }
 
-CAN_distance_sensor: DisanceSensor = {
+CAN_distance_sensor: DistanceSensor = {
     "sensor": 1,
     "distance": 10,
     "alarm": 2,
