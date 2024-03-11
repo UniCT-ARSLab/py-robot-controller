@@ -28,6 +28,7 @@ async def broadcast():
             print(message)
             if message == "ALIGN":
                 print("## align received!")
+                robot.send_align()
 
         await asyncio.sleep(1) # delay
 

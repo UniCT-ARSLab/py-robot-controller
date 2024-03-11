@@ -201,4 +201,17 @@ class Robot:
 
         return []
 
+    def send_align(self) -> None:
+        data = struct.pack(
+            CAN_FORMATS["ALIGN"], CAN_IDS["STRATEGY_COMMAND_ALIGN_GRANDE1"], 0, 0, 1, 1
+        )
+        msg = Message(
+            arbitration_id=CAN_IDS["STRATEGY_COMMAND_ALIGN_GRANDE1"],
+            data=data,
+            is_extended_id=False,
+            is_rx=False,
+        )
+        self.bus.send(msg)
+
+
 robot = Robot()
