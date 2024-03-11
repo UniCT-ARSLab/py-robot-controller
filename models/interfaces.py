@@ -20,7 +20,8 @@ class RobotStatus(TypedDict):
     robot_selected: int
     status_display: int
 
-class DisanceSensor(TypedDict):
+
+class DistanceSensor(TypedDict):
     sensor: int
     distance: int
     alarm: int
