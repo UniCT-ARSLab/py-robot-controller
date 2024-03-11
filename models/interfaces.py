@@ -20,8 +20,17 @@ class RobotStatus(TypedDict):
     robot_selected: int
     status_display: int
 
-
 class DistanceSensor(TypedDict):
     sensor: int
     distance: int
     alarm: int
+    # char padding[4]
+
+
+class StrategyCommand(TypedDict):
+    cmd: int
+    flags: int  # color
+    elapsed_time: int
+    stgy: int
+    align: int
+    # char padding[2]

@@ -1,12 +1,11 @@
 import struct
 from random import randrange
+from time import sleep
 from typing import Any, List
 
 from breezylidar import URG04LX
 from can import Message
 from can.interface import Bus
-
-from time import sleep
 
 # from models.socket import position_mocks
 from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS
