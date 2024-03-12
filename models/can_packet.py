@@ -16,8 +16,7 @@ CAN_IDS = {
     "ST_CMD": 0x710,
     "OBST_MAP": 0x70F,
     "STRATEGY_COMMAND": 0x710,
-    "STRATEGY_COMMAND_ALIGN_GRANDE1": 0x01,
-    "STRATEGY_COMMAND_ALIGN_PICCOLO": 0x03,
+    "STRATEGY_COMMAND_CAN_ID": 0x01,
 }
 
 MOTION_CMDS = {
@@ -27,6 +26,11 @@ MOTION_CMDS = {
     'FW_TO_DISTANCE': 0x85,
     'ROTATE_RELATIVE': 0x88,
     'SET_SPEED': 0x8C,
+}
+
+STRATEGY_CMDS = {
+    "STRATEGY_COMMAND_ALIGN_GRANDE1": 0x01,
+    "STRATEGY_COMMAND_ALIGN_PICCOLO": 0x03,
 }
 
 CAN_FORMATS = {
@@ -62,7 +66,7 @@ CAN_distance_sensor: DistanceSensor = {
 
 
 CAN_align: StrategyCommand = {
-    "cmd": CAN_IDS["STRATEGY_COMMAND_ALIGN_GRANDE1"],
+    "cmd": STRATEGY_CMDS["STRATEGY_COMMAND_ALIGN_GRANDE1"],
     "flags": 0,
     "elapsed_time": 0,
     "stgy": 1,
