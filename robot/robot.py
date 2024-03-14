@@ -1,12 +1,11 @@
 import struct
 from random import randrange
+from time import sleep
 from typing import Any, List
 
 from breezylidar import URG04LX
 from can import Message
 from can.interface import Bus
-
-from time import sleep
 
 # from models.socket import position_mocks
 from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS
@@ -201,5 +200,18 @@ class Robot:
             return self.laser_data
 
         return []
+
+    def send_align(self) -> None:
+        data = struct.pack(
+            CAN_FORMATS["ALIGN"], CAN_IDS["STRATEGY_COMMAND_CAN_ID"], 0, 0, 1, 1
+        )
+        msg = Message(
+            arbitration_id=CAN_IDS["STRATEGY_COMMAND_CAN_ID"],
+            data=data,
+            is_extended_id=False,
+            is_rx=False,
+        )
+        self.bus.send(msg)
+
 
 robot = Robot()

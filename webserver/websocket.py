@@ -22,6 +22,14 @@ async def broadcast():
         # print(f"clients = {len(CLIENTS)}")
         websockets.broadcast(CLIENTS, get_lidar_data())
         websockets.broadcast(CLIENTS, get_robot_data())
+
+        for websocket in CLIENTS:
+            message = await websocket.recv()
+            print(message)
+            if message == "ALIGN":
+                print("## align received!")
+                robot.send_align()
+
         await asyncio.sleep(1) # delay
 
 
