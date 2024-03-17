@@ -65,7 +65,7 @@ virtual_messages: List[VirtualMessages] = [
         "data": CAN_distance_sensor,
     },
     {
-        "packet_id": CAN_IDS["STRATEGY_COMMAND_CAN_ID"],
+        "packet_id": CAN_IDS["STRATEGY_COMMAND"],
         "format": CAN_FORMATS["ALIGN"],
         "data": CAN_align,
     },

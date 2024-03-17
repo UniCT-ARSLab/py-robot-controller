@@ -2,6 +2,7 @@ DEBUG_CAN = True
 DEBUG_LIDAR = False
 DEBUG_VIRTUAL = True
 DEBUG_VCAN = False
+DEBUG_MESSAGES = True
 
 CHANNEL = 'can0'
 VCHANNEL = 'vcan0'
