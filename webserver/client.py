@@ -12,3 +12,8 @@ def response(data):
 
     sio.disconnect()
     exit(0)
+
+import time
+
+while True:
+    time.sleep(0.1)
