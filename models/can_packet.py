@@ -16,7 +16,6 @@ CAN_IDS = {
     "ST_CMD": 0x710,
     "OBST_MAP": 0x70F,
     "STRATEGY_COMMAND": 0x710,
-    "STRATEGY_COMMAND_CAN_ID": 0x01,
 }
 
 MOTION_CMDS = {

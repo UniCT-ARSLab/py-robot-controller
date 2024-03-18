@@ -8,7 +8,7 @@ from can import Message
 from can.interface import Bus
 
 # from models.socket import position_mocks
-from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS
+from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS, CAN_align
 from models.interfaces import DistanceSensor, Position, RobotStatus
 from models.lidar_mock import SCANDATA_MOCKS
 from robot.config import (
@@ -16,6 +16,7 @@ from robot.config import (
     CHANNEL,
     DEBUG_CAN,
     DEBUG_LIDAR,
+    DEBUG_MESSAGES,
     DEBUG_VCAN,
     DEBUG_VIRTUAL,
     LIDAR_DEVICE,
@@ -62,7 +63,8 @@ class Robot:
         data = frm.data
 
         if frm.arbitration_id not in CAN_IDS.values():
-            print(f"Unknown CAN ID: {frm.arbitration_id}")
+            if DEBUG_MESSAGES:
+                print(f"Unknown CAN ID: {frm.arbitration_id}")
             return
 
         if frm.arbitration_id in (CAN_IDS["ROBOT_POSITION"], CAN_IDS["OTHER_ROBOT_POSITION"]):
@@ -73,6 +75,8 @@ class Robot:
             self.__handle_robot_status(data)
         elif frm.arbitration_id == CAN_IDS["DISTANCE_SENSOR"]:
             self.__handle_distance_sensor(data)
+        elif frm.arbitration_id == CAN_IDS["STRATEGY_COMMAND"]:
+            print("## strategy command in CAN")
 
     def __handle_position(self, data: bytearray) -> None:
         posX, posY, angle, flags, bumpers = struct.unpack(CAN_FORMATS["POSITION"], data)
@@ -190,9 +194,9 @@ class Robot:
                 self.laser_data = self.laser.getScan()
             # pylint: disable=bare-except
             except:
-                # to.do: we could put this in a separate thread
-                print("ERROR reading LiDAR data, waiting 10 seconds")
-                sleep(10)
+                # to do: we could put this in a separate thread
+                print("ERROR reading LiDAR data, waiting 5 seconds")
+                sleep(5)
 
         if self.laser_data:
             if DEBUG_LIDAR:
@@ -202,16 +206,14 @@ class Robot:
         return []
 
     def send_align(self) -> None:
-        data = struct.pack(
-            CAN_FORMATS["ALIGN"], CAN_IDS["STRATEGY_COMMAND_CAN_ID"], 0, 0, 1, 1
-        )
+        print("## send align")
+        data = struct.pack(CAN_FORMATS["ALIGN"], *(CAN_align.values()))
         msg = Message(
-            arbitration_id=CAN_IDS["STRATEGY_COMMAND_CAN_ID"],
+            arbitration_id=CAN_IDS["STRATEGY_COMMAND"],
             data=data,
             is_extended_id=False,
             is_rx=False,
         )
         self.bus.send(msg)
-
 
 robot = Robot()
