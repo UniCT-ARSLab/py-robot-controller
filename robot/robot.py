@@ -6,11 +6,13 @@ from typing import Any, List
 from breezylidar import URG04LX
 from can import Message
 from can.interface import Bus
+from pymitter import EventEmitter
 
 # from models.socket import position_mocks
 from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS, CAN_align
 from models.interfaces import DistanceSensor, Position, RobotStatus
 from models.lidar_mock import SCANDATA_MOCKS
+from models.message_queue_events import MessageQueueEvents
 from robot.config import (
     CAN_BAUD,
     CHANNEL,
@@ -27,11 +29,14 @@ from robot.motion_command import MotionCommand
 
 # pylint: disable=too-many-instance-attributes
 class Robot:
-    def __init__(self):
+
+    def __init__(self, global_events: EventEmitter):
         # Initialize the CAN bus
         _channel = VCHANNEL if DEBUG_VCAN else CHANNEL
         _bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
         self.bus = Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
+
+        self.events = global_events
 
         # Initialize the lidar
         self.laser_data = []
@@ -50,6 +55,11 @@ class Robot:
 
         # tof alarms data
         self.distance_sensor: DistanceSensor = {"sensor": 0, "distance": 0, "alarm": 0}
+
+        self.events_management()
+
+    def events_management(self) -> None:
+        self.events.on(MessageQueueEvents.NEW_CAN_PACKET.value, self.on_data_received)
 
     def on_data_received(self, frm: Message) -> None:
         """
@@ -100,7 +110,7 @@ class Robot:
             print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
 
     def __handle_speed(self, data: bytearray) -> None:
-        linear_speed, _ = struct.unpack(CAN_FORMATS["VELOCITY"], data)
+        linear_speed = struct.unpack(CAN_FORMATS["VELOCITY"], data)
         self.linear_speed = linear_speed  # type: ignore
 
         if DEBUG_CAN:
@@ -215,5 +225,3 @@ class Robot:
             is_rx=False,
         )
         self.bus.send(msg)
-
-robot = Robot()
