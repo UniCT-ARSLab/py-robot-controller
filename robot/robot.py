@@ -4,37 +4,34 @@ from time import sleep
 from typing import Any, List
 
 from breezylidar import URG04LX
-from can import Message
-from can.interface import Bus
+from can import BusABC, Message
+from pymitter import EventEmitter
 
 # from models.socket import position_mocks
 from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS, CAN_align
 from models.interfaces import DistanceSensor, Position, RobotStatus
 from models.lidar_mock import SCANDATA_MOCKS
+from models.message_queue_events import MessageQueueEvents
 from robot.config import (
-    CAN_BAUD,
-    CHANNEL,
     DEBUG_CAN,
     DEBUG_LIDAR,
     DEBUG_MESSAGES,
     DEBUG_VCAN,
     DEBUG_VIRTUAL,
     LIDAR_DEVICE,
-    VCHANNEL,
 )
 from robot.motion_command import MotionCommand
 
 
 # pylint: disable=too-many-instance-attributes
 class Robot:
-    def __init__(self):
-        # Initialize the CAN bus
-        _channel = VCHANNEL if DEBUG_VCAN else CHANNEL
-        _bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
-        self.bus = Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
+
+    def __init__(self, bus: BusABC, global_events: EventEmitter):
+        self.bus = bus
+        self.events = global_events
 
         # Initialize the lidar
-        self.laser_data = []
+        self.laser_data: list = []
         self.laser: Any = None
 
         # init robot values with placeholders
@@ -51,6 +48,11 @@ class Robot:
         # tof alarms data
         self.distance_sensor: DistanceSensor = {"sensor": 0, "distance": 0, "alarm": 0}
 
+        self.events_management()
+
+    def events_management(self) -> None:
+        self.events.on(MessageQueueEvents.NEW_CAN_PACKET.value, self.on_data_received)
+
     def on_data_received(self, frm: Message) -> None:
         """
         Handle the data received from the CAN bus depending on the CAN ID.
@@ -59,7 +61,10 @@ class Robot:
         :type frm: can.Message
         :return: None
         """
-        # Extract data from the CAN message
+        if not isinstance(frm, Message):
+            print("⚠️  malformed CAN message")
+            return
+
         data = frm.data
 
         if frm.arbitration_id not in CAN_IDS.values():
@@ -100,7 +105,7 @@ class Robot:
             print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
 
     def __handle_speed(self, data: bytearray) -> None:
-        linear_speed, _ = struct.unpack(CAN_FORMATS["VELOCITY"], data)
+        linear_speed = struct.unpack(CAN_FORMATS["VELOCITY"], data)
         self.linear_speed = linear_speed  # type: ignore
 
         if DEBUG_CAN:
@@ -215,5 +220,3 @@ class Robot:
             is_rx=False,
         )
         self.bus.send(msg)
-
-robot = Robot()

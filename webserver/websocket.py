@@ -5,8 +5,6 @@ from typing import Union
 import websockets
 from websockets import Data, WebSocketServerProtocol, serve
 
-from robot.robot import robot
-
 CLIENTS: set[WebSocketServerProtocol] = set()
 clients_map = {}
 
@@ -38,7 +36,8 @@ async def start_receive_from_client(websocket: WebSocketServerProtocol) -> None:
 
 def handle_message(message: Data) -> None:
     if message == "ALIGN":
-        robot.send_align()
+        # robot.send_align()
+        pass
 
 
 async def websocket_loop() -> None:
@@ -61,16 +60,13 @@ async def start_websocket(host: Union[str, None], port: int):
 
 
 def get_lidar_data() -> str:
-    laser_data_msg = {
-        "type": "lidar",
-        "data": robot.get_lidar_data(),
-    }
+    laser_data_msg = {"type": "lidar", "data": "data"}  # robot.get_lidar_data(),
     return json.dumps(laser_data_msg)
 
 
 def get_robot_data() -> str:
     robot_position_msg = {
         "type": "robot_data",
-        "data": robot.get_robot_data(),
+        "data": "data",  # robot.get_robot_data(),
     }
     return json.dumps(robot_position_msg)

@@ -1,5 +1,20 @@
-flask
+# CAN
 python-can
+
+# LiDAR
 git+https://github.com/simondlevy/BreezyLidar.git#egg=BreezyLidar&subdirectory=python
-websockets
 BreezyLidar
+
+# web services
+flask
+flask_cors
+flask_socketio
+socketio
+python-engineio
+python-socketio
+websockets
+websocket-client
+gevent==22.8.0 # todo: clean
+gevent-websocket
+eventlet
+pymitter
