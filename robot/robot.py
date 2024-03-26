@@ -7,17 +7,19 @@ from breezylidar import URG04LX
 from can import BusABC, Message
 from pymitter import EventEmitter
 
-# from models.socket import position_mocks
 from models.can_packet import CAN_FORMATS, CAN_IDS, MOTION_CMDS, CAN_align
 from models.interfaces import DistanceSensor, Position, RobotStatus
 from models.lidar_mock import SCANDATA_MOCKS
 from models.message_queue_events import MessageQueueEvents
+from models.socket import position_mocks
 from robot.config import (
     DEBUG_CAN,
     DEBUG_LIDAR,
     DEBUG_MESSAGES,
+    DEBUG_POSITION,
     DEBUG_VCAN,
     DEBUG_VIRTUAL,
+    ENABLE_LIDAR,
     LIDAR_DEVICE,
 )
 from robot.motion_command import MotionCommand
@@ -32,12 +34,13 @@ class Robot:
         self.events = global_events
 
         # Initialize the lidar
-        self.laser_data: list = []
+        self.laser_data: List[int] = []
         self.laser: Any = None
 
-        # init robot values with placeholders
-        self.StartPosition: Position = { "X": -1000, "Y": -1000, "Angle": 0, "Flags": 0, "Bumpers": 0 }
-        self.Position: Position = { "X": 0, "Y": 0, "Angle": 0, "Flags": 0, "Bumpers": 0 }
+        if ENABLE_LIDAR:
+            self.init_lidar()
+
+        self.position: Position = {"X": 0, "Y": 0, "Angle": 0, "Flags": 0, "Bumpers": 0}
 
         self.linear_speed = 0
 
@@ -53,6 +56,11 @@ class Robot:
 
     def events_management(self) -> None:
         self.events.on(MessageQueueEvents.NEW_CAN_PACKET.value, self.on_data_received)
+        self.events.on(MessageQueueEvents.SEND_ALIGN.value, self.on_send_align)
+        self.events.on(MessageQueueEvents.END_CYCLE.value, self.get_lidar_data)
+
+        if DEBUG_POSITION:
+            self.events.on(MessageQueueEvents.END_CYCLE.value, self.debug_position)
 
     def on_data_received(self, frm: Message) -> None:
         """
@@ -90,17 +98,11 @@ class Robot:
         # Convert the angle to a float by dividing by 100
         angle /= 100.0
 
-        # Update the robot's position information
-        if self.StartPosition["X"] < -999:
-            self.StartPosition["X"] = posX
-            self.StartPosition["Y"] = posY
-            self.StartPosition["Angle"] = angle
-
-        self.Position["X"] = posX
-        self.Position["Y"] = posY
-        self.Position["Angle"] = angle
-        self.Position["Flags"] = flags
-        self.Position["Bumpers"] = bumpers
+        self.position["X"] = posX
+        self.position["Y"] = posY
+        self.position["Angle"] = angle
+        self.position["Flags"] = flags
+        self.position["Bumpers"] = bumpers
 
         if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
             print(
@@ -108,6 +110,8 @@ class Robot:
                     f"Position: [X: {posX}, Y: {posY}, A: {angle}]", bcolors.OKGREEN
                 )
             )
+
+        self.events.emit(MessageQueueEvents.ROBOT_DATA.value, self.get_robot_data())
 
     def __handle_speed(self, data: bytearray) -> None:
         linear_speed = struct.unpack(CAN_FORMATS["VELOCITY"], data)
@@ -135,17 +139,13 @@ class Robot:
             print(colorit(f"distance {distance}", bcolors.OKGREEN))
             print(colorit(f"alarm {alarm}", bcolors.OKGREEN))
 
-    # currently unused
-    def get_position(self) -> Position:
-        return self.Position
-
     def get_robot_data(self) -> dict:
-        # for debugging
-        # index = randrange(0, len(position_mocks))
-        # self.Position = position_mocks[index]
+        if DEBUG_POSITION:
+            index = randrange(0, len(position_mocks))
+            self.position = position_mocks[index]
 
         robot_data = {
-            **self.Position,
+            **self.position,
             "linear_speed": self.linear_speed,
             **self.robot_status,
             **self.distance_sensor,
@@ -191,12 +191,13 @@ class Robot:
         if not DEBUG_VIRTUAL and not DEBUG_VCAN:
             self.laser = URG04LX(LIDAR_DEVICE)
 
-    def get_lidar_data(self) -> List[int]:
+    def get_lidar_data(self) -> None:
         """
         Get the data from the lidar. If DEBUG_VIRTUAL or DEBUG_VCAN are True, the data is mocked.
-        :return: List[int]
+        :return: None
         """
-        if DEBUG_VIRTUAL or DEBUG_VCAN:
+
+        if DEBUG_LIDAR:
             index = randrange(0, len(SCANDATA_MOCKS))
             self.laser_data = SCANDATA_MOCKS[index]
         else:
@@ -211,14 +212,12 @@ class Robot:
                 sleep(5)
 
         if self.laser_data:
-            if DEBUG_LIDAR:
+            if DEBUG_MESSAGES:
                 print(self.laser_data)
-            return self.laser_data
 
-        return []
+            self.events.emit(MessageQueueEvents.LIDAR_DATA.value, self.laser_data)
 
-    def send_align(self) -> None:
-        print(colorit("## send align"), bcolors.OKGREEN)
+    def on_send_align(self, data) -> None:
         data = struct.pack(CAN_FORMATS["ALIGN"], *(CAN_align.values()))
         msg = Message(
             arbitration_id=CAN_IDS["STRATEGY_COMMAND"],
@@ -227,3 +226,8 @@ class Robot:
             is_rx=False,
         )
         self.bus.send(msg)
+        print(colorit("## send align", bcolors.OKGREEN))
+        print(colorit(str(msg), bcolors.OKGREEN))
+
+    def debug_position(self) -> None:
+        self.events.emit(MessageQueueEvents.ROBOT_DATA.value, self.get_robot_data())
