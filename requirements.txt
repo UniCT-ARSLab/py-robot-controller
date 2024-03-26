@@ -2,8 +2,7 @@
 python-can
 
 # LiDAR
-# git+https://github.com/simondlevy/BreezyLidar.git#egg=BreezyLidar&subdirectory=python
-BreezyLidar
+# "git+https://github.com/simondlevy/BreezyLidar.git#egg=BreezyLidar&subdirectory=python"
 
 # web services
 flask
