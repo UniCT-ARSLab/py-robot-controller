@@ -1,7 +1,10 @@
+import eventlet
+# this fix the missing socketio emitted events
+eventlet.monkey_patch()  # pylint: disable=wrong-import-position
+
 import threading
 from threading import Semaphore
 
-import eventlet
 from can import Message
 from flask import Flask
 from flask_cors import CORS
@@ -12,7 +15,6 @@ from models.message_queue_events import MessageQueueEvents
 from utils.helper import proper_exit
 from webserver.routes import define_routes
 
-eventlet.monkey_patch()  # this fix the missing socketio emitted events
 
 # pylint: disable=too-many-instance-attributes
 class WebServer:

@@ -7,6 +7,8 @@ BreezyLidar
 
 # web services
 flask
+flask_cors
+flask_socketio
 socketio
 python-engineio
 python-socketio
