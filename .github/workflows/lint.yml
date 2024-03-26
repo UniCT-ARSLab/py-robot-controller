@@ -32,7 +32,7 @@ jobs:
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
 
       - name: Lint with pylint
-        run: pylint webserver robot models tests
+        run: pylint webserver robot models tests utils
 
       - name: Lint with flake8
         run: |
@@ -42,4 +42,4 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Lint with mypy
-        run: mypy webserver robot models tests --check-untyped-defs --ignore-missing-imports
+        run: mypy webserver robot models tests utils --check-untyped-defs --ignore-missing-imports

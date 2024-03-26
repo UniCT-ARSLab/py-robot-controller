@@ -12,7 +12,7 @@ python-engineio
 python-socketio
 websockets
 websocket-client
-gevent==22.8.0
+gevent==22.8.0 # todo: clean
 gevent-websocket
 eventlet
 pymitter

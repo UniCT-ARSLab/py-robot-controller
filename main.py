@@ -14,36 +14,36 @@ from robot.config import (
     VCHANNEL,
 )
 from robot.robot import Robot
+from utils.colors import bcolors
 from utils.helper import proper_exit
 from webserver.webserver import WebServer
-
-# run webserver asynchronously in a separate thread
-# threading.Thread(target=start_socket).start()
 
 _bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
 _channel = VCHANNEL if DEBUG_VCAN else CHANNEL
 bus = Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
 
-if DEBUG_CAN or DEBUG_VIRTUAL or DEBUG_VCAN:
-    v_bus = init_debug(bus, _bustype, _channel)
-
 events = EventEmitter()
-robot = Robot(events)
+robot = Robot(bus, events)
 robot.init_lidar()
 
 try:
     webServer = WebServer(host="0.0.0.0", port=5000, global_events=events)
     webServer.start()
 
+    if DEBUG_CAN:
+        time.sleep(5)  # wait that the web clients connection
+
+    if DEBUG_CAN or DEBUG_VIRTUAL or DEBUG_VCAN:
+        v_bus = init_debug(bus, _bustype, _channel)
+
     while True:
         robot.get_lidar_data()
 
         message = bus.recv()
         if DEBUG_CAN:
-            print(message)
+            print(f"{bcolors.OKCYAN.value}{message}{bcolors.ENDC.value}")
 
         if message is not None:
-            time.sleep(5)
             events.emit(MessageQueueEvents.NEW_CAN_PACKET.value, message)
 
 except KeyboardInterrupt:

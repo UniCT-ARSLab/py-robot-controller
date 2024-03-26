@@ -5,8 +5,6 @@ from typing import Union
 import websockets
 from websockets import Data, WebSocketServerProtocol, serve
 
-# from robot.robot import robot
-
 CLIENTS: set[WebSocketServerProtocol] = set()
 clients_map = {}
 

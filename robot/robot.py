@@ -4,8 +4,7 @@ from time import sleep
 from typing import Any, List
 
 from breezylidar import URG04LX
-from can import Message
-from can.interface import Bus
+from can import BusABC, Message
 from pymitter import EventEmitter
 
 # from models.socket import position_mocks
@@ -14,15 +13,12 @@ from models.interfaces import DistanceSensor, Position, RobotStatus
 from models.lidar_mock import SCANDATA_MOCKS
 from models.message_queue_events import MessageQueueEvents
 from robot.config import (
-    CAN_BAUD,
-    CHANNEL,
     DEBUG_CAN,
     DEBUG_LIDAR,
     DEBUG_MESSAGES,
     DEBUG_VCAN,
     DEBUG_VIRTUAL,
     LIDAR_DEVICE,
-    VCHANNEL,
 )
 from robot.motion_command import MotionCommand
 
@@ -30,16 +26,12 @@ from robot.motion_command import MotionCommand
 # pylint: disable=too-many-instance-attributes
 class Robot:
 
-    def __init__(self, global_events: EventEmitter):
-        # Initialize the CAN bus
-        _channel = VCHANNEL if DEBUG_VCAN else CHANNEL
-        _bustype = "virtual" if DEBUG_VIRTUAL or DEBUG_VCAN else "socketcan"
-        self.bus = Bus(channel=_channel, bustype=_bustype, bitrate=CAN_BAUD)
-
+    def __init__(self, bus: BusABC, global_events: EventEmitter):
+        self.bus = bus
         self.events = global_events
 
         # Initialize the lidar
-        self.laser_data = []
+        self.laser_data: list = []
         self.laser: Any = None
 
         # init robot values with placeholders
@@ -69,7 +61,10 @@ class Robot:
         :type frm: can.Message
         :return: None
         """
-        # Extract data from the CAN message
+        if not isinstance(frm, Message):
+            print("⚠️  malformed CAN message")
+            return
+
         data = frm.data
 
         if frm.arbitration_id not in CAN_IDS.values():
