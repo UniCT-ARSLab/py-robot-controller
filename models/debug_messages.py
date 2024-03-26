@@ -1,6 +1,7 @@
 from typing import List, Union
 
 from can import BusABC, Message
+from pymitter import EventEmitter
 
 from models.can_packet import (
     CAN_FORMATS,
@@ -12,8 +13,10 @@ from models.can_packet import (
     CAN_velocity,
 )
 from models.interfaces import VirtualMessages
+from models.message_queue_events import MessageQueueEvents
 from robot.config import CHANNEL, DEBUG_CAN, DEBUG_VCAN, DEBUG_VIRTUAL
 from robot.virtual import get_v_bus, get_v_message
+from utils.colors import bcolors, colorit
 
 virtual_messages: List[VirtualMessages] = [
     {
@@ -54,10 +57,12 @@ virtual_messages: List[VirtualMessages] = [
 ]
 
 
-def init_debug(bus: BusABC, _bustype: str, _channel: str) -> Union[BusABC, None]:
+def init_debug(
+    bus: BusABC, _bustype: str, _channel: str, events: EventEmitter
+) -> Union[BusABC, None]:
     if DEBUG_CAN:
-        print(f"ℹ️  Bus type: {_bustype}")
-        print(f"ℹ️  Channel: {_channel}")
+        print(colorit(f"ℹ️  Bus type: {_bustype}", bcolors.OKGREEN))
+        print(colorit(f"ℹ️  Channel: {_channel}", bcolors.OKGREEN))
 
     if DEBUG_VIRTUAL or DEBUG_VCAN:
         v_messages: List[Message] = []
@@ -74,8 +79,20 @@ def init_debug(bus: BusABC, _bustype: str, _channel: str) -> Union[BusABC, None]
         for virtual_message in v_messages:
             v_bus.send(virtual_message)
 
+        events.on(MessageQueueEvents.END_CYCLE.value, lambda: on_end_cycle(v_bus))
+
     if DEBUG_VCAN:
         for virtual_message in v_messages:
             bus.send(virtual_message)
 
     return v_bus
+
+
+def on_end_cycle(v_bus: BusABC) -> None:
+    msg = Message(
+        arbitration_id=0,
+        data=[0],
+        is_extended_id=False,
+        is_rx=False,
+    )
+    v_bus.send(msg)
