@@ -14,6 +14,7 @@ from models.can_packet import (
 from models.interfaces import VirtualMessages
 from robot.config import CHANNEL, DEBUG_CAN, DEBUG_VCAN, DEBUG_VIRTUAL
 from robot.virtual import get_v_bus, get_v_message
+from utils.colors import bcolors, colorit
 
 virtual_messages: List[VirtualMessages] = [
     {
@@ -56,8 +57,8 @@ virtual_messages: List[VirtualMessages] = [
 
 def init_debug(bus: BusABC, _bustype: str, _channel: str) -> Union[BusABC, None]:
     if DEBUG_CAN:
-        print(f"ℹ️  Bus type: {_bustype}")
-        print(f"ℹ️  Channel: {_channel}")
+        print(colorit(f"ℹ️  Bus type: {_bustype}", bcolors.OKGREEN))
+        print(colorit(f"ℹ️  Channel: {_channel}", bcolors.OKGREEN))
 
     if DEBUG_VIRTUAL or DEBUG_VCAN:
         v_messages: List[Message] = []

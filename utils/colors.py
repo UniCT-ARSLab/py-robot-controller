@@ -11,3 +11,7 @@ class bcolors(Enum):
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+
+
+def colorit(string: str, color: bcolors) -> str:
+    return f"{color.value}{string}{bcolors.ENDC.value}"

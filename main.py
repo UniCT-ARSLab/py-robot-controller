@@ -14,7 +14,7 @@ from robot.config import (
     VCHANNEL,
 )
 from robot.robot import Robot
-from utils.colors import bcolors
+from utils.colors import bcolors, colorit
 from utils.helper import proper_exit
 from webserver.webserver import WebServer
 
@@ -41,15 +41,16 @@ try:
 
         message = bus.recv()
         if DEBUG_CAN:
-            print(f"{bcolors.OKCYAN.value}{message}{bcolors.ENDC.value}")
+            print(colorit(str(message), bcolors.OKCYAN))
 
         if message is not None:
             events.emit(MessageQueueEvents.NEW_CAN_PACKET.value, message)
 
 except KeyboardInterrupt:
-    print("KeyboardInterrupt")
+    print(colorit("KeyboardInterrupt", bcolors.FAIL))
 except Exception as e:
-    print(str(e))
+    print(colorit(str(e), bcolors.FAIL))
+
 finally:
     bus.shutdown()
 

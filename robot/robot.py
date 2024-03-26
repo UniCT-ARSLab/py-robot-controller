@@ -21,6 +21,7 @@ from robot.config import (
     LIDAR_DEVICE,
 )
 from robot.motion_command import MotionCommand
+from utils.colors import bcolors, colorit
 
 
 # pylint: disable=too-many-instance-attributes
@@ -62,14 +63,14 @@ class Robot:
         :return: None
         """
         if not isinstance(frm, Message):
-            print("⚠️  malformed CAN message")
+            print(colorit("⚠️  malformed CAN message", bcolors.WARNING))
             return
 
         data = frm.data
 
         if frm.arbitration_id not in CAN_IDS.values():
             if DEBUG_MESSAGES:
-                print(f"Unknown CAN ID: {frm.arbitration_id}")
+                print(colorit(f"Unknown CAN ID: {frm.arbitration_id}", bcolors.WARNING))
             return
 
         if frm.arbitration_id in (CAN_IDS["ROBOT_POSITION"], CAN_IDS["OTHER_ROBOT_POSITION"]):
@@ -81,7 +82,7 @@ class Robot:
         elif frm.arbitration_id == CAN_IDS["DISTANCE_SENSOR"]:
             self.__handle_distance_sensor(data)
         elif frm.arbitration_id == CAN_IDS["STRATEGY_COMMAND"]:
-            print("## strategy command in CAN")
+            print(colorit("## strategy command in CAN", bcolors.OKGREEN))
 
     def __handle_position(self, data: bytearray) -> None:
         posX, posY, angle, flags, bumpers = struct.unpack(CAN_FORMATS["POSITION"], data)
@@ -102,14 +103,18 @@ class Robot:
         self.Position["Bumpers"] = bumpers
 
         if DEBUG_CAN: # debug can viene usata per scopi diversi (switch da virtual a socket / logging), forse serve un altro flag
-            print(f"Position: [X: {posX}, Y: {posY}, A: {angle}]")
+            print(
+                colorit(
+                    f"Position: [X: {posX}, Y: {posY}, A: {angle}]", bcolors.OKGREEN
+                )
+            )
 
     def __handle_speed(self, data: bytearray) -> None:
         linear_speed = struct.unpack(CAN_FORMATS["VELOCITY"], data)
         self.linear_speed = linear_speed  # type: ignore
 
         if DEBUG_CAN:
-            print('linear_speed', linear_speed)
+            print(colorit(f"linear_speed {linear_speed}", bcolors.OKGREEN))
 
     def __handle_robot_status(self, data: bytearray) -> None:
         robot_selected, status_display = struct.unpack(CAN_FORMATS["ROBOT_STATUS"], data)
@@ -118,17 +123,17 @@ class Robot:
         self.robot_status["status_display"] = status_display
 
         if DEBUG_CAN:
-            print('robot_selected', robot_selected)
-            print('status_display', status_display)
+            print(colorit(f"robot_selected {robot_selected}", bcolors.OKGREEN))
+            print(colorit(f"status_display {status_display}", bcolors.OKGREEN))
 
     def __handle_distance_sensor(self, data: bytearray) -> None:
         sensor, distance, alarm = struct.unpack(CAN_FORMATS["DISTANCE_SENSOR"], data)
         self.distance_sensor = {"sensor": sensor, "distance": distance, "alarm": alarm}
 
         if DEBUG_CAN:
-            print('sensor', sensor)
-            print('distance', distance)
-            print('alarm', alarm)
+            print(colorit(f"sensor {sensor}", bcolors.OKGREEN))
+            print(colorit(f"distance {distance}", bcolors.OKGREEN))
+            print(colorit(f"alarm {alarm}", bcolors.OKGREEN))
 
     # currently unused
     def get_position(self) -> Position:
@@ -200,7 +205,9 @@ class Robot:
             # pylint: disable=bare-except
             except:
                 # to do: we could put this in a separate thread
-                print("ERROR reading LiDAR data, waiting 5 seconds")
+                print(
+                    colorit("ERROR reading LiDAR data, waiting 5 seconds", bcolors.FAIL)
+                )
                 sleep(5)
 
         if self.laser_data:
@@ -211,7 +218,7 @@ class Robot:
         return []
 
     def send_align(self) -> None:
-        print("## send align")
+        print(colorit("## send align"), bcolors.OKGREEN)
         data = struct.pack(CAN_FORMATS["ALIGN"], *(CAN_align.values()))
         msg = Message(
             arbitration_id=CAN_IDS["STRATEGY_COMMAND"],

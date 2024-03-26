@@ -1,4 +1,7 @@
 import eventlet
+
+from utils.colors import bcolors, colorit
+
 # this fix the missing socketio emitted events
 eventlet.monkey_patch()  # pylint: disable=wrong-import-position
 
@@ -46,11 +49,11 @@ class WebServer:
     def start(self) -> None:
         try:
             self.main_thread.start()
-            print("Web Server Started")
-            print(f"[http://127.0.0.1:{str(self.port)}]")
+            print(colorit("Web Server Started", bcolors.OKBLUE))
+            print(colorit(f"[http://127.0.0.1:{str(self.port)}]", bcolors.OKBLUE))
             # self.running_mutex.acquire()
         except KeyboardInterrupt:
-            print("Web Server closed")
+            print(colorit("Web Server closed", bcolors.OKBLUE))
             # self.running_mutex.release()
             proper_exit()
 
@@ -64,28 +67,28 @@ class WebServer:
             )
         except KeyboardInterrupt:
             self.running_mutex.release()
-            print("Web Server closed")
+            print(colorit("Web Server closed", bcolors.OKBLUE))
             proper_exit()
 
     def define_socket_io_events(self) -> None:
         @self.socketio.on("connect")
         def on_connect() -> None:
-            print("Web Client Connected (socketIO)")
+            print(colorit("Web Client Connected (socketIO)", bcolors.OKBLUE))
             self.socketio.emit("CONNECT")
 
         @self.socketio.on("disconnect")
         def on_disconnect() -> None:
-            print("Web Client Disconnected (socketIO)")
+            print(colorit("Web Client Disconnected (socketIO)", bcolors.OKBLUE))
 
         @self.socketio.on("ping")
         def on_ping() -> None:
             self.socketio.emit("pong")
-            print("Web Client Pinged (socketIO)")
+            print(colorit("Web Client Pinged (socketIO)", bcolors.OKBLUE))
 
         @self.socketio.on("message")
         def on_message(message) -> None:
             self.socketio.emit("message pong")
-            print(message)
+            print(colorit(message, bcolors.OKBLUE))
             self.events.emit(MessageQueueEvents.NEW_CAN_PACKET.value, message)
 
     def events_management(self) -> None:
